@@ -41,12 +41,12 @@ Optionally, the type of the elements of the vector can be specified
 in the first argument.
 """
 function ket(t::Type, label::String, base::Int)
-  basis_vector( t, parseint(label, base), 2^length(label) )
+  basis_vector( t, parseint(label, base), base^length(label) )
 end
-
 ket( label::String, base=2 ) = ket(Float64, label, base)
-ket( t::Type, label::String ) = ket(T, label, 2)
-ket{T<:Integer}( i::T, d=2 ) = basis_vector( Float64, Int(i), d )
+ket( t::Type, label::String ) = ket(t, label, 2)
+
+ket( i::Int, d=2 ) = basis_vector( Float64, i, d )
 
 # the duals of the above
 """
@@ -135,11 +135,11 @@ end
 # TODO: specialized, fast versions of partial trace
 
 function _max_entangled_state( d::Int )
-  me = zeros(d^2)
+  me = zeros(Float64,d^2)
   for ii=0:d-1
     me += kron(ket(ii,d),ket(ii,d))/sqrt(d)
   end
-  me
+  return me
 end
 
 """
