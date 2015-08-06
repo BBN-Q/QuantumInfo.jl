@@ -1,11 +1,11 @@
-# QuantumInformationProcessing.jl
+# QuantumInfo.jl
 
 This package contains functions that are convenient for common
 calculation in quantum information processing. 
 
 Install it with the following command:
 
-	  Pkg.add("QuantumInformationProcessing")
+	  Pkg.add("QuantumInfo")
 
 # Acknowledgements
 

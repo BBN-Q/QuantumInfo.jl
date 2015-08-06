@@ -1,4 +1,4 @@
-The QuantumInformationProcessing.jl package is licensed under the MIT "Expat" License:
+The QuantumInfo.jl package is licensed under the MIT "Expat" License:
 
 > Copyright (c) 2014: Raytheon BBN Technologies.
 >
