@@ -18,7 +18,11 @@ export mat,
        pauliliou2liou,
        dissipator,
        hamiltonian,
-       depol
+       depol,
+       istp,
+       iscp,
+       ischannel,
+       isunital
 
 mat( v::Vector, r=round(Int,sqrt(length(v))), c=round(Int,sqrt(length(v))) ) = reshape( v, r, c )
 liou{T<:AbstractMatrix}( left::T, right::T ) = kron( transpose(right), left )
@@ -155,4 +159,30 @@ function unital{T}( m::Matrix{T} )
   d  = round(Int,sqrt(d2))
   id = projector(normalize(vec(eye(d))))
   id*m*id + (I-id)*m*(I-id)
+end
+
+function iscp(m, tol=0.0)
+    evs = eigvals(liou2choi(m))
+    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    println(minimum(real(evs)))
+    println(norm(imag(evs)))
+    all(real(evs) .> -tol) && all(abs(imag(evs)) .< tol)
+end
+
+function istp(m, tol=0.0)
+    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    dsq = size(m,1)
+    d = round(Int,sqrt(dsq))
+    norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
+end
+
+function ischannel(m, tol=0.0)
+    iscp(m,tol) && istp(m,tol)
+end
+
+function isunital(m, tol=0.0)
+    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    dsq = size(m,1)
+    d = round(Int,sqrt(dsq))
+    norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
 end

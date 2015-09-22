@@ -1,4 +1,6 @@
-import Base.trace
+using SchattenNorms
+
+import Base.trace#, Base.isposdef
 
 export ket,
        bra,
@@ -9,7 +11,8 @@ export ket,
        purify,
        fidelity,
        concurrence,
-       avg_fidelity
+       avg_fidelity,
+       ispossemidef
 
 """
 Returns the `(i+1)`th basis element in a `d` dimensional Euclidean space
@@ -216,3 +219,17 @@ end
 # fidelity Matrix Matrix
 # superfidelity Matrix Matrix
 # subfidelity Matrix Matrix
+
+"""
+Tests if a matrix is positive semidefinite within a given tolerance.
+"""
+function ispossemidef(m,tol=0.0)
+    evs = eigvals(Hermitian(m))
+    tol = tol==0.0 ? eps(eltype(evs)) : tol
+    for ev in evs
+        if ev < -tol 
+            return false
+        end
+    end
+    return true
+end
