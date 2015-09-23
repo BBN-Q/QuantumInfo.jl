@@ -8,6 +8,7 @@ export ket,
        trace,
        projector,
        normalize,
+       normalize!,
        purify,
        fidelity,
        concurrence,
@@ -100,10 +101,21 @@ end
 
 normalize( m::Matrix ) = m/trnorm(m)
 
-# TODO: normalize!( v::Vector ) 
-# TODO: normalize!( m::Matrix ) 
+""" 
+Normalizes a vector in place with respect to the Euclidean norm
+(L2 norm), or a matrix with respect to the trace norm (Schatten 1
+norm).  
+"""
+function normalize!( v::AbstractVector ) 
+    n = norm(v)
+    scale!(v,1/n)
+end
 
-# partial trace
+function normalize!( m::AbstractMatrix ) 
+    n = trnorm(m)
+    scale!(m,1/n)
+end
+
 """
 Computes the partial trace of a matrix `m`.
 """
@@ -158,8 +170,6 @@ function purify{T}( rho::Matrix{T} )
   psi
 end
 
-# TODO: superoperator purification? in OpenQuantumSystems?
-
 """
 Computes the concurrence of a bipartite qubit state.
 """
@@ -175,7 +185,7 @@ end
 
 """
 Computes the fidelity between two quantum states. By default, the Josza convention
-is used. The Uhlmann fideilty may be calculated by using the `kind` keyword argument
+is used. The Uhlmann fidelity may be calculated by using the `kind` keyword argument
 with the value `:uhlmann`.
 """
 function fidelity(a::Matrix,b::Matrix;kind=:josza)
@@ -223,7 +233,7 @@ end
 """
 Tests if a matrix is positive semidefinite within a given tolerance.
 """
-function ispossemidef(m,tol=0.0)
+function ispossemidef(m;tol=0.0)
     evs = eigvals(Hermitian(m))
     tol = tol==0.0 ? eps(eltype(evs)) : tol
     for ev in evs
