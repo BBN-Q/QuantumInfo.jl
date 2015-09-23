@@ -154,33 +154,31 @@ end
 Given a superoperator, it extracts the closest superoperator (in Frobenius norm)
 that is unital. The result may not be completely positive.
 """
-function unital{T}( m::Matrix{T} )
+function unitalproj{T}( m::Matrix{T} )
   d2 = size(m,1)
   d  = round(Int,sqrt(d2))
   id = projector(normalize(vec(eye(d))))
   id*m*id + (I-id)*m*(I-id)
 end
 
-function iscp(m, tol=0.0)
+function iscp(m; tol=0.0)
     evs = eigvals(liou2choi(m))
     tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
-    println(minimum(real(evs)))
-    println(norm(imag(evs)))
     all(real(evs) .> -tol) && all(abs(imag(evs)) .< tol)
 end
 
-function istp(m, tol=0.0)
+function istp(m; tol=0.0)
     tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
     norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
 end
 
-function ischannel(m, tol=0.0)
-    iscp(m,tol) && istp(m,tol)
+function ischannel(m; tol=0.0)
+    iscp(m,tol=tol) && istp(m,tol=tol)
 end
 
-function isunital(m, tol=0.0)
+function isunital(m; tol=0.0)
     tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
