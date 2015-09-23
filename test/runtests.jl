@@ -4,9 +4,9 @@ import Base.isapprox
 
 rtoldefault = Base.rtoldefault
 
-function isapprox(m1::Matrix,m2::Matrix; rtol::Real=rtoldefault(abs(m1[1,1]),abs(m2[1,1])), atol::Real=0)
-  all(x->isapprox(x,0.0,rtol=rtol,atol=atol),abs(m1-m2))
-end
+#function isapprox(m1::Matrix,m2::Matrix; rtol::Real=rtoldefault(abs(m1[1,1]),abs(m2[1,1])), atol::Real=0)
+#  all(x->isapprox(x,0.0,rtol=rtol,atol=atol),abs(m1-m2))
+#end
 
 function isapprox{T1,T2}(v1::Vector{Matrix{T1}},v2::Vector{Matrix{T2}}; rtol::Real=rtoldefault(abs(v1[1][1,1]),abs(v2[1][1,1])), atol::Real=0)
   local v
@@ -18,17 +18,17 @@ function isapprox{T1,T2}(v1::Vector{Matrix{T1}},v2::Vector{Matrix{T2}}; rtol::Re
   end
 end
 
-function ishermitian(m::Matrix; rtol::Real=rtoldefault(abs((m[1,1]+conj(m[1,1]))/2),abs(m[1,1])), atol::Real=0)
-  isapprox((m+m')/2,m,rtol=rtol,atol=atol)
-end
+#function ishermitian(m::Matrix; rtol::Real=rtoldefault(abs((m[1,1]+conj(m[1,1]))/2),abs(m[1,1])), atol::Real=0)
+#  isapprox((m+m')/2,m,rtol=rtol,atol=atol)
+#end
 
-function ispositive(m::Matrix;rtol::Real=-1,atol::Real=0)
-  if rtol<0
-      ishermitian(m) && all(x->isapprox(x,0,atol=atol),filter(x->x<0,eigvals(Hermitian(m))))
-  else
-      ishermitian(m) && all(x->isapprox(x,0,atol=atol,rtol=rtol),filter(x->x<0,eigvals(Hermitian(m))))
-  end
-end
+#function ispositive(m::Matrix;rtol::Real=-1,atol::Real=0)
+#  if rtol<0
+#      ishermitian(m) && all(x->isapprox(x,0,atol=atol),filter(x->x<0,eigvals(Hermitian(m))))
+#  else
+#      ishermitian(m) && all(x->isapprox(x,0,atol=atol,rtol=rtol),filter(x->x<0,eigvals(Hermitian(m))))
+#  end
+#end
 
 let
 
@@ -69,7 +69,7 @@ let
     rrho = trace(projector(normalize(randn(3^3)+1im*randn(3^3))),[3,9],2)
     @test isapprox(trace(rrho),1.)
     @test ishermitian(rrho)
-    @test ispositive(rrho)
+    @test ispossemidef(rrho)
     
     ru = svd(randn(3,3)+1im*randn(3,3))[1]
     @test isapprox(ru*ru',eye(3),atol=1e-13)
@@ -77,7 +77,7 @@ let
     
     rv = svd(randn(3,3)+1im*randn(3,3))[1]
     re = (liou(ru)+liou(rv))/2
-    @test ispositive(liou2choi(re),atol=1e-13)
+    @test ispossemidef(liou2choi(re),tol=1e-13)
     @test isapprox(trace(liou2choi(re),[3,3],2),eye(3)/3,atol=1e-15)
   end
 
