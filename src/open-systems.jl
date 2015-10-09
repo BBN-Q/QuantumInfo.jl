@@ -22,7 +22,8 @@ export mat,
        istp,
        iscp,
        ischannel,
-       isunital
+       isunital,
+       nearestu
 
 mat( v::Vector, r=round(Int,sqrt(length(v))), c=round(Int,sqrt(length(v))) ) = reshape( v, r, c )
 liou{T<:AbstractMatrix}( left::T, right::T ) = kron( transpose(right), left )
@@ -175,6 +176,8 @@ function istp(m; tol=0.0)
 end
 
 function ischannel(m; tol=0.0)
+    #println(iscp(m,tol=tol))
+    #println(istp(m,tol=tol))
     iscp(m,tol=tol) && istp(m,tol=tol)
 end
 
@@ -183,4 +186,18 @@ function isunital(m; tol=0.0)
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
     norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
+end
+
+"""
+Computes the unitary CP map closest (interferometrically) to a given CP map. 
+See D. Oi, [Phys. Rev. Lett. 91, 067902 (2003)](http://journals.aps.org/prl/abstract/10.1103/PhysRevLett.91.067902)
+"""
+function nearestu(l)
+    c = liou2choi(l)
+    vals,vecs = eig(Hermitian(c))
+    imax = indmax(vals)
+    Λ = mat(vecs[:,imax])
+    U,Σ,V = svd(Λ)
+    W = U*V'
+    return kron(conj(W),W)
 end

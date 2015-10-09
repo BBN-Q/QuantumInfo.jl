@@ -189,7 +189,7 @@ is used. The Uhlmann fidelity may be calculated by using the `kind` keyword argu
 with the value `:uhlmann`.
 """
 function fidelity(a::Matrix,b::Matrix;kind=:josza)
-    fu = strnorm(sqrtm(a)*sqrtm(b))
+    fu = trnorm(sqrtm(a)*sqrtm(b))
     if kind==:josza
         return fu^2
     elseif kind==:uhlmann
