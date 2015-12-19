@@ -44,11 +44,11 @@ allowed are 0 through the dimension minus 1.
 Optionally, the type of the elements of the vector can be specified
 in the first argument.
 """
-function ket(t::Type, label::String, base::Int)
+function ket(t::Type, label::AbstractString, base::Int)
   basis_vector( t, parseint(label, base), base^length(label) )
 end
-ket( label::String, base=2 ) = ket(Float64, label, base)
-ket( t::Type, label::String ) = ket(t, label, 2)
+ket( label::AbstractString, base=2 ) = ket(Float64, label, base)
+ket( t::Type, label::AbstractString ) = ket(t, label, 2)
 
 ket( i::Int, d=2 ) = basis_vector( Float64, i, d )
 
@@ -59,13 +59,13 @@ unit vector in some Hilbert space.
 
 See `ket` for details on how the corresponding vector may be specified.
 """
-function bra( t::Type, label::String, base::Int )
+function bra( t::Type, label::AbstractString, base::Int )
   return ket( t, label, base )'
 end
 
-bra( label::String, base::Int ) = bra( Float64, label, base )
-bra( label::String ) = bra( Float64, label, 2 )
-bra( t::Type, label::String ) = bra( t, label, 2 )
+bra( label::AbstractString, base::Int ) = bra( Float64, label, base )
+bra( label::AbstractString ) = bra( Float64, label, 2 )
+bra( t::Type, label::AbstractString ) = bra( t, label, 2 )
 bra( i::Int, d::Int ) = ket( i, d )'
 
 """
@@ -76,10 +76,10 @@ unit vectors for a row and a column.
 
 See `ket` for details on how the corresponding vectors may be specified.
 """
-ketbra( t::Type, label_left::String, label_right::String, base::Int ) = ket( t, label_left, base ) * bra( t, label_right, base )
-ketbra( label_left::String, label_right::String, base::Int ) = ket( label_left, base ) * bra( label_right, base )
-ketbra( label_left::String, label_right::String ) = ket( label_left ) * bra( label_right )
-ketbra( t::Type, label_left::String, label_right::String ) = ket( t, label_left ) * bra( t, label_right )
+ketbra( t::Type, label_left::AbstractString, label_right::AbstractString, base::Int ) = ket( t, label_left, base ) * bra( t, label_right, base )
+ketbra( label_left::AbstractString, label_right::AbstractString, base::Int ) = ket( label_left, base ) * bra( label_right, base )
+ketbra( label_left::AbstractString, label_right::AbstractString ) = ket( label_left ) * bra( label_right )
+ketbra( t::Type, label_left::AbstractString, label_right::AbstractString ) = ket( t, label_left ) * bra( t, label_right )
 ketbra( i::Int, j::Int, d::Int ) = ket( i, d ) * bra( j, d )
 
 """
