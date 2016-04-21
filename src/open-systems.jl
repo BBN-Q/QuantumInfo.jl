@@ -19,6 +19,7 @@ export mat,
        dissipator,
        hamiltonian,
        depol,
+       isposdemidef,
        istp,
        iscp,
        ischannel,
@@ -107,8 +108,6 @@ function hamiltonian( h::Matrix )
   -1im * ( liou(h,eye(h)) - liou(eye(h),h) )
 end
 
-_num2quat(n,l) = map(s->parse(Int,s),collect(base(4,n,l)))
-
 function pauliliou2liou( m::Matrix )
   if size(m,1) != size(m,2)
     error("Only square matrices supported")
@@ -117,10 +116,10 @@ function pauliliou2liou( m::Matrix )
   end
   dsq = size(m,1)
   res = zeros(Complex128,size(m))
-  l = round(Int,log2(dsq)/2)
-  for i=1:dsq
-    for j=1:dsq
-      res += m[i,j] * vec(complex(Pauli(_num2quat(i-1,l)))) * vec(complex(Pauli(_num2quat(j-1,l))))' / sqrt(dsq)
+  n = round(Int,log(2,dsq)/2)
+  for (i,pi) in enumerate(allpaulis(n))
+    for (j,pj) in enumerate(allpaulis(n))
+      res += m[i,j] * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq)
     end
   end
   res
@@ -134,10 +133,10 @@ function liou2pauliliou{T}( m::Matrix{T} )
   end
   dsq = size(m,1)
   res = zeros(Complex128,size(m))
-  l = round(Int,log2(dsq)/2)
-  for i=1:dsq
-    for j=1:dsq
-      res[i,j] += trace( m * vec(complex(Pauli(_num2quat(j-1,l)))) * vec(complex(Pauli(_num2quat(i-1,l))))' / sqrt(dsq) )
+  n = round(Int,log(2,dsq)/2)
+  for (i,pi) in enumerate(allpaulis(n))
+    for (j,pj) in enumerate(allpaulis(n))
+      res[i,j] += trace( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
     end
   end
   res
@@ -167,12 +166,42 @@ function unitalproj{T}( m::Matrix{T} )
   id*m*id + (I-id)*m*(I-id)
 end
 
-function iscp(m; tol=0.0)
-    evs = eigvals(liou2choi(m))
+"""
+ispossemidef(m; tol)
+
+Checks if a matrix is positive semidefinite.
+"""
+function ispossemidef(m; tol=0.0)
+    evs = eigvals(m)
     tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
     all(real(evs) .> -tol) && all(abs(imag(evs)) .< tol)
 end
 
+"""
+ishermitian(m; tol)
+
+Checks if a matrix is Hermitian.
+"""
+function ishermitian(m; tol=0.0)
+    ah = (m-m')/2
+    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    norm(ah,Inf)<tol
+end
+
+"""
+iscp(m; tol)
+
+Checks if the liouville representation of a map (in the natural, computational basis) is completely positive.
+"""
+function iscp(m; tol=0.0)
+    ispossemidef(liou2choi(m))
+end
+
+"""
+istp(m; tol)
+
+Checks if the Liouville representation of a map is trace preserving (TP).
+"""
 function istp(m; tol=0.0)
     tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
@@ -180,12 +209,20 @@ function istp(m; tol=0.0)
     norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
 end
 
+"""
+ischannel(m; tol)
+
+Checks if the Liouville representation of a map is completely positive (CP) and trace preserving (TP).
+"""
 function ischannel(m; tol=0.0)
-    #println(iscp(m,tol=tol))
-    #println(istp(m,tol=tol))
     iscp(m,tol=tol) && istp(m,tol=tol)
 end
 
+"""
+isunital(m; tol)
+
+Checks the conditions for unitality of a map in Liouville representation.
+"""
 function isunital(m; tol=0.0)
     tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
@@ -194,6 +231,25 @@ function isunital(m; tol=0.0)
 end
 
 """
+isliouvillian(m; tol)
+
+Checks the conditions for a physical Liouvillian matrix (CPTP map generator)
+"""
+function isliouvillian(m;tol=0.0)
+    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol 
+
+    mΓ = choi_liou_involution(m)
+    d = round(Int,sqrt(size(m,1)))
+    ω = sum([kron(ket(i,d),ket(i,d)) for i in 0:d-1])/sqrt(d)
+    Πω = projector(ω)
+    Πω⊥ = eye(d^2)-Πω
+
+    return ishermitian(mΓ,tol=tol) && norm(ω'*m,Inf)<tol && ispossemidef(Πω⊥*mΓ*Πω⊥,tol=tol)
+end
+
+"""
+nearestu(l)
+
 Computes the unitary CP map closest (interferometrically) to a given CP map. 
 See D. Oi, [Phys. Rev. Lett. 91, 067902 (2003)](http://journals.aps.org/prl/abstract/10.1103/PhysRevLett.91.067902)
 """
