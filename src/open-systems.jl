@@ -2,7 +2,7 @@ using Cliffords
 
 export mat,
        liou,
-       unital,
+       unitalproj,
        choi_liou_involution,
        swap_involution,
        choi2liou,
@@ -100,11 +100,11 @@ end
 
 # TODO: Add support for sparse matrices
 function dissipator( a::Matrix )
-  liou(a,a') - 1/2 * liou(a'*a, eye(size(a)...)) - 1/2 * liou(eye(size(a)...),a'*a)
+  liou(a,a') - 1/2 * liou(a'*a, eye(a)) - 1/2 * liou(eye(a),a'*a)
 end
 
 function hamiltonian( h::Matrix )
-  -1im * ( liou(h,eye(size(h)...)) - liou(eye(size(h)...),h) )
+  -1im * ( liou(h,eye(h)) - liou(eye(h),h) )
 end
 
 _num2quat(n,l) = map(s->parse(Int,s),collect(base(4,n,l)))
@@ -144,7 +144,9 @@ function liou2pauliliou{T}( m::Matrix{T} )
 end
 
 """
-Returns a superoperator that replaces the input with a maximally
+`depol(d, p=1.0)`
+
+`depol` return a superoperator that replaces the input with a maximally
 mixed state with probability p, and leaves it unchanged with probability (1-p).
 """
 function depol( d::Int, p=1.0 )
@@ -152,8 +154,11 @@ function depol( d::Int, p=1.0 )
 end
 
 """
-Given a superoperator, it extracts the closest superoperator (in Frobenius norm)
-that is unital. The result may not be completely positive.
+`unitalproj(m)`
+
+Given a superoperator `j` in a Liouville representation, `unitalproj`
+extracts the closest superoperator (in Frobenius norm) that is
+unital. The result may not be completely positive.
 """
 function unitalproj{T}( m::Matrix{T} )
   d2 = size(m,1)
