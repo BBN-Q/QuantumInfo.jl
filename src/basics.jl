@@ -12,20 +12,24 @@ export ket,
        purify,
        fidelity,
        concurrence,
-       avg_fidelity,
+       avgfidelity,
        ispossemidef
 
 """
+`basis_vector(T,i,d)`
+
 Returns the `(i+1)`th basis element in a `d` dimensional Euclidean space
 as a vector of type `t`.
 """
-function basis_vector( t::Type, i::Int, d::Int )
-  result = zeros(t, d)
+function basis_vector{T}( t::Type{T}, i::Int, d::Int )
+  result = zeros(T, d)
   result[i+1] = 1
   result
 end
 
 """
+`ket`
+
 Returns a vector corresponding to a particular basis unit vector in some
 Hilbert space. 
 
@@ -54,6 +58,8 @@ ket( i::Int, d=2 ) = basis_vector( Float64, i, d )
 
 # the duals of the above
 """
+`bra`
+
 Returns a dual vector (row vector) corresponding to a particular basis
 unit vector in some Hilbert space.
 
@@ -69,6 +75,8 @@ bra( t::Type, label::AbstractString ) = bra( t, label, 2 )
 bra( i::Int, d::Int ) = ket( i, d )'
 
 """
+`ketbra`
+
 Returns the outer product between a dual vector (row vector) and a vector,
 each corresponding to a particular basis unit vector in some Hilbert space.
 This can also be interpreted as a matrix unite element specified by two
@@ -83,6 +91,8 @@ ketbra( t::Type, label_left::AbstractString, label_right::AbstractString ) = ket
 ketbra( i::Int, j::Int, d::Int ) = ket( i, d ) * bra( j, d )
 
 """
+`projector(v)`
+
 Computes the rank-1 projector operator corresponding to a given vector. If more than one
 vector is given, the projector into the space spanned by the vectors is computed.
 """
@@ -92,6 +102,8 @@ function projector( v::Vector )
 end
 
 """
+`normalize(v)`
+
 Normalizes a vector with respect to the Euclidean norm (L2 norm), or 
 a matrix with respect to the trace norm (Schatten 1 norm).
 """
@@ -102,6 +114,8 @@ end
 normalize( m::Matrix ) = m/trnorm(m)
 
 """ 
+`normalize!(v)`
+
 Normalizes a vector in place with respect to the Euclidean norm
 (L2 norm), or a matrix with respect to the trace norm (Schatten 1
 norm).  
