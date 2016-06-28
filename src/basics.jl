@@ -13,7 +13,7 @@ export ket,
        avgfidelity,
        ispossemidef
 
-trnorm(M::Matrix) = trace(sqrtm(M'*M))
+trnorm(M::Matrix) = sum(svdvals(M))
 
 """
 `basis_vector(T,i,d)`
