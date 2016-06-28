@@ -1,5 +1,3 @@
-using SchattenNorms
-
 import Base.trace#, Base.isposdef
 
 export ket,
@@ -14,6 +12,8 @@ export ket,
        concurrence,
        avgfidelity,
        ispossemidef
+
+trnorm(M::Matrix) = trace(sqrtm(M'*M))
 
 """
 `basis_vector(T,i,d)`
