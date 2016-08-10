@@ -1,4 +1,4 @@
-import Base.trace#, Base.isposdef
+import Base: trace, normalize, normalize!
 
 export ket,
        bra,
@@ -102,29 +102,18 @@ function projector( v::Vector )
 end
 
 """
-`normalize(v)`
+`normalize(m)`
 
-Normalizes a vector with respect to the Euclidean norm (L2 norm), or 
-a matrix with respect to the trace norm (Schatten 1 norm).
+Normalizes a matrix with respect to the trace norm (Schatten 1 norm).
 """
-function normalize( v::Vector )
-    return v/norm(v)
-end
-
-normalize( m::Matrix ) = m/trnorm(m)
+normalize( m::AbstractMatrix ) = m/trnorm(m)
 
 """ 
 `normalize!(v)`
 
-Normalizes a vector in place with respect to the Euclidean norm
-(L2 norm), or a matrix with respect to the trace norm (Schatten 1
-norm).  
+Normalizes a matrix with respect to the trace norm (Schatten 1
+norm) in place.  
 """
-function normalize!( v::AbstractVector ) 
-    n = norm(v)
-    scale!(v,1/n)
-end
-
 function normalize!( m::AbstractMatrix ) 
     n = trnorm(m)
     scale!(m,1/n)
