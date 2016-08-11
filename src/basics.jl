@@ -1,3 +1,5 @@
+using Compat
+
 import Base: trace, normalize, normalize!
 
 export ket,
