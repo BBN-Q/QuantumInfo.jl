@@ -1,5 +1,3 @@
-using Cliffords
-
 export mat,
        liou,
        unitalproj,
@@ -254,7 +252,7 @@ liouvillian_violation(m; tol)
 Computes violation of conditions for a physical Liouvillian matrix (CPTP map generator)
 """
 function liouvillian_violation(m;tol=0.0)
-    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol 
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
 
     mΓ = choi_liou_involution(m)
     d = round(Int,sqrt(size(m,1)))
@@ -268,7 +266,7 @@ end
 """
 nearestu(l)
 
-Computes the unitary CP map closest to a given CP map in an interferometric sense. 
+Computes the unitary CP map closest to a given CP map in an interferometric sense.
 See D. Oi, [Phys. Rev. Lett. 91, 067902 (2003)](http://journals.aps.org/prl/abstract/10.1103/PhysRevLett.91.067902)
 """
 function nearestu(l)

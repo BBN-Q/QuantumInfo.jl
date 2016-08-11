@@ -13,7 +13,8 @@ export ket,
        fidelity,
        concurrence,
        avgfidelity,
-       ispossemidef
+       ispossemidef,
+       pauli_decomp
 
 trnorm(M::Matrix) = sum(svdvals(M))
 
@@ -33,7 +34,7 @@ end
 `ket`
 
 Returns a vector corresponding to a particular basis unit vector in some
-Hilbert space. 
+Hilbert space.
 
 The vector can be specified in a number of different ways:
    + by a string and a base
@@ -110,13 +111,13 @@ Normalizes a matrix with respect to the trace norm (Schatten 1 norm).
 """
 normalize( m::AbstractMatrix ) = m/trnorm(m)
 
-""" 
+"""
 `normalize!(v)`
 
 Normalizes a matrix with respect to the trace norm (Schatten 1
-norm) in place.  
+norm) in place.
 """
-function normalize!( m::AbstractMatrix ) 
+function normalize!( m::AbstractMatrix )
     n = trnorm(m)
     scale!(m,1/n)
 end
@@ -216,9 +217,9 @@ end
 
 """
 Computes the average fidelity of the outputs of two quantum operations in the Liouville
-representation. One of the operations is assumed to be a unitary quantum operation. The 
+representation. One of the operations is assumed to be a unitary quantum operation. The
 fidelity measure used is the one defined by Josza.
-""" 
+"""
 function avgfidelity(liou,liou_uni;kind=:josza)
     d = sqrt(size(liou,2))
     f = (real(trace(liou*liou_uni'))+d)/(d^2+d)
@@ -242,9 +243,25 @@ function ispossemidef(m;tol=0.0)
     evs = eigvals(Hermitian(m))
     tol = tol==0.0 ? eps(eltype(evs)) : tol
     for ev in evs
-        if ev < -tol 
+        if ev < -tol
             return false
         end
     end
     return true
+end
+
+"""
+Decompose a density matrix into Pauli operators with a given cutoff.
+"""
+function pauli_decomp(ρ::Matrix, cutoff=1e-3)
+    r = Dict{Pauli,Float64}()
+    d2 = size(ρ, 1)
+    d = round(Int, sqrt(d2))
+    for p in allpaulis(d)
+        val = real(trace(ρ * p)) / d2
+        if val > cutoff
+            r[p] = val
+        end
+    end
+    return r
 end
