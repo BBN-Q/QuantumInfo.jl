@@ -174,7 +174,7 @@ Checks if a matrix is positive semidefinite.
 """
 function ispossemidef(m; tol=0.0)
     evs = eigvals(m)
-    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     all(real(evs) .> -tol) && all(abs(imag(evs)) .< tol)
 end
 
@@ -185,7 +185,7 @@ Checks if a matrix is Hermitian.
 """
 function ishermitian(m; tol=0.0)
     ah = (m-m')/2
-    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     norm(ah,Inf)<tol
 end
 
@@ -204,7 +204,7 @@ istp(m; tol)
 Checks if the Liouville representation of a map is trace preserving (TP).
 """
 function istp(m; tol=0.0)
-    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
     norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
@@ -225,7 +225,7 @@ isunital(m; tol)
 Checks the conditions for unitality of a map in Liouville representation.
 """
 function isunital(m; tol=0.0)
-    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
     norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
@@ -237,7 +237,7 @@ isliouvillian(m; tol)
 Checks the conditions for a physical Liouvillian matrix (CPTP map generator)
 """
 function isliouvillian(m;tol=0.0)
-    tol = tol==0.0 ? eps(abs(one(eltype(m)))) : tol 
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol 
 
     mΓ = choi_liou_involution(m)
     d = round(Int,sqrt(size(m,1)))
@@ -249,9 +249,26 @@ function isliouvillian(m;tol=0.0)
 end
 
 """
+liouvillian_violation(m; tol)
+
+Computes violation of conditions for a physical Liouvillian matrix (CPTP map generator)
+"""
+function liouvillian_violation(m;tol=0.0)
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol 
+
+    mΓ = choi_liou_involution(m)
+    d = round(Int,sqrt(size(m,1)))
+    ω = sum([kron(ket(i,d),ket(i,d)) for i in 0:d-1])/sqrt(d)
+    Πω = projector(ω)
+    Πω⊥ = eye(d^2)-Πω
+
+    return (ahermpart(mΓ), ω'*m, Πω⊥*mΓ*Πω⊥)
+end
+
+"""
 nearestu(l)
 
-Computes the unitary CP map closest (interferometrically) to a given CP map. 
+Computes the unitary CP map closest to a given CP map in an interferometric sense. 
 See D. Oi, [Phys. Rev. Lett. 91, 067902 (2003)](http://journals.aps.org/prl/abstract/10.1103/PhysRevLett.91.067902)
 """
 function nearestu(l)
