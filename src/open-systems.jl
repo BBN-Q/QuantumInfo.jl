@@ -17,7 +17,6 @@ export mat,
        dissipator,
        hamiltonian,
        depol,
-       isposdemidef,
        istp,
        iscp,
        ischannel,
@@ -163,17 +162,6 @@ function unitalproj{T}( m::Matrix{T} )
   d  = round(Int,sqrt(d2))
   id = projector(normalize(vec(eye(d))))
   id*m*id + (I-id)*m*(I-id)
-end
-
-"""
-ispossemidef(m; tol)
-
-Checks if a matrix is positive semidefinite.
-"""
-function ispossemidef(m; tol=0.0)
-    evs = eigvals(m)
-    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
-    all(real(evs) .> -tol) && all(abs(imag(evs)) .< tol)
 end
 
 """

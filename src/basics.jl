@@ -241,7 +241,7 @@ Tests if a matrix is positive semidefinite within a given tolerance.
 """
 function ispossemidef(m;tol=0.0)
     evs = eigvals(Hermitian(m))
-    tol = tol==0.0 ? eps(eltype(evs)) : tol
+    tol = tol==0.0 ? 1e2*eps(eltype(evs)) : tol
     for ev in evs
         if ev < -tol
             return false
