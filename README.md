@@ -22,7 +22,7 @@ MIT Expat license.
 
 # Authors and Copyright
 
-Written by Marcus P da Silva (@marcusps). Contributions by Colm Ryan.
+Written by Marcus P da Silva (@marcusps). Contributions by Colm Ryan, Matt Ware, and Blake Johnson.
 
 (c) 2014 Raytheon BBN Technologies
 
