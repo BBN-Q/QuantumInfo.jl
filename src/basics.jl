@@ -1,6 +1,10 @@
 using Compat
 
-import Base: trace, normalize, normalize!
+import Base.trace
+
+if VERSION > v"0.5-"
+    import Base: normalize, normalize!
+end
 
 export ket,
        bra,
