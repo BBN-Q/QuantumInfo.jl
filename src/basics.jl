@@ -240,14 +240,9 @@ end
 Tests if a matrix is positive semidefinite within a given tolerance.
 """
 function ispossemidef(m;tol=0.0)
-    evs = eigvals(Hermitian(m))
-    tol = tol==0.0 ? 1e2*eps(eltype(evs)) : tol
-    for ev in evs
-        if ev < -tol
-            return false
-        end
-    end
-    return true
+    evs = eigvals(m)
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
+    all(real(evs) .> -tol) && all(abs(imag(evs)) .< tol)
 end
 
 """
