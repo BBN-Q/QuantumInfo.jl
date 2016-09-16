@@ -1,6 +1,8 @@
 # QuantumInfo.jl
 
-This package contains functions that are convenient for common
+[![Build Status](https://travis-ci.org/BBN-Q/QuantumInfo.jl.svg?branch=master)](https://travis-ci.org/BBN-Q/QuantumInfo.jl)
+
+This Julia package contains functions that are convenient for common
 calculation in quantum information processing. 
 
 Install it with the following command:
