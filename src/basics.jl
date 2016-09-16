@@ -1,18 +1,12 @@
 using Compat
 
-import Base.trace
-
-if VERSION > v"0.5-"
-    import Base: normalize, normalize!
-end
-
 export ket,
        bra,
        ketbra,
-       trace,
+       partialtrace,
        projector,
-       normalize,
-       normalize!,
+       # normalize,
+       # normalize!,
        purify,
        fidelity,
        concurrence,
@@ -129,7 +123,7 @@ end
 """
 Computes the partial trace of a matrix `m`.
 """
-function trace{T}( m::Matrix{T}, ds::Vector, dt::Int )
+function partialtrace{T}( m::Matrix{T}, ds::Vector, dt::Int )
   s = size(m)
   l = length(ds);
   if s[1] != s[2]

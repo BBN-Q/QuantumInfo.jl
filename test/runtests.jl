@@ -35,10 +35,10 @@ let
   for i=1:100
     da = round(Int,round(rand()*10))+1
     db = round(Int,round(rand()*10))+1
-    ra = trace(projector(normalize(randn(da*3)+1im*randn(da*3))),[da,3],2)
-    rb = trace(projector(normalize(randn(db*3)+1im*randn(db*3))),[db,3],2)
-    @test isapprox(trace(kron(ra,rb),[da,db],1),rb,atol=1e-15)
-    @test isapprox(trace(kron(ra,rb),[da,db],2),ra,atol=1e-15)
+    ra = partialtrace(projector(normalize(randn(da*3)+1im*randn(da*3))),[da,3],2)
+    rb = partialtrace(projector(normalize(randn(db*3)+1im*randn(db*3))),[db,3],2)
+    @test isapprox(partialtrace(kron(ra,rb),[da,db],1),rb,atol=1e-15)
+    @test isapprox(partialtrace(kron(ra,rb),[da,db],2),ra,atol=1e-15)
   end
 
   id_choi = 1/2.*[1 0 0 1;0 0 0 0;0 0 0 0;1 0 0 1];
@@ -66,7 +66,7 @@ let
     rpsi = normalize(randn(3)+1im*randn(3))
     @test isapprox(norm(rpsi),1.)
     
-    rrho = trace(projector(normalize(randn(3^3)+1im*randn(3^3))),[3,9],2)
+    rrho = partialtrace(projector(normalize(randn(3^3)+1im*randn(3^3))),[3,9],2)
     @test isapprox(trace(rrho),1.)
     @test ishermitian(rrho)
     @test ispossemidef(rrho)
@@ -78,7 +78,7 @@ let
     rv = svd(randn(3,3)+1im*randn(3,3))[1]
     re = (liou(ru)+liou(rv))/2
     @test ispossemidef(liou2choi(re),tol=1e-13)
-    @test isapprox(trace(liou2choi(re),[3,3],2),eye(3)/3,atol=1e-15)
+    @test isapprox(partialtrace(liou2choi(re),[3,3],2),eye(3)/3,atol=1e-15)
   end
 
   @test isapprox(liou2pauliliou(eye(4)), eye(4))
