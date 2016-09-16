@@ -1,5 +1,9 @@
 using Compat
 
+if VERSION > v"0.5.0-"
+    import Base: normalize, normalize!
+end
+
 export ket,
        bra,
        ketbra,
