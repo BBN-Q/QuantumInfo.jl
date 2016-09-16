@@ -106,6 +106,11 @@ function projector( v::Vector )
     v_*v_'
 end
 
+if VERSION < v"0.5"
+    normalize( v::Vector ) = v/norm(v)
+    normalize!( v::Vector ) = scale!(v,1/norm(v))
+end
+
 """
 `normalize(m)`
 

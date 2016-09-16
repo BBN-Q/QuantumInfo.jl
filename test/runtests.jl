@@ -4,6 +4,10 @@ import Base.isapprox
 
 rtoldefault = Base.rtoldefault
 
+if VERSION < v"0.5"
+    normalize = qi.normalize
+end
+
 #function isapprox(m1::Matrix,m2::Matrix; rtol::Real=rtoldefault(abs(m1[1,1]),abs(m2[1,1])), atol::Real=0)
 #  all(x->isapprox(x,0.0,rtol=rtol,atol=atol),abs(m1-m2))
 #end
