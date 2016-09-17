@@ -1,16 +1,12 @@
 using Compat
 
-if VERSION > v"0.5.0-"
-    import Base: normalize, normalize!
-end
-
 export ket,
        bra,
        ketbra,
        partialtrace,
        projector,
-       # normalize,
-       # normalize!,
+       trnormalize,
+       trnormalize!,
        purify,
        fidelity,
        concurrence,
@@ -102,29 +98,23 @@ Computes the rank-1 projector operator corresponding to a given vector. If more 
 vector is given, the projector into the space spanned by the vectors is computed.
 """
 function projector( v::Vector )
-    v_ = normalize(v)
-    v_*v_'
-end
-
-if VERSION < v"0.5"
-    normalize( v::Vector ) = v/norm(v)
-    normalize!( v::Vector ) = scale!(v,1/norm(v))
+    v*v'/norm(v,2)^2
 end
 
 """
-`normalize(m)`
+`trnormalize(m)`
 
 Normalizes a matrix with respect to the trace norm (Schatten 1 norm).
 """
-normalize( m::AbstractMatrix ) = m/trnorm(m)
+trnormalize( m::AbstractMatrix ) = m/trnorm(m)
 
 """
-`normalize!(v)`
+`trnormalize!(v)`
 
 Normalizes a matrix with respect to the trace norm (Schatten 1
 norm) in place.
 """
-function normalize!( m::AbstractMatrix )
+function trnormalize!( m::AbstractMatrix )
     n = trnorm(m)
     scale!(m,1/n)
 end

@@ -4,10 +4,6 @@ import Base.isapprox
 
 rtoldefault = Base.rtoldefault
 
-if VERSION < v"0.5"
-    normalize = QuantumInfo.normalize
-end
-
 #function isapprox(m1::Matrix,m2::Matrix; rtol::Real=rtoldefault(abs(m1[1,1]),abs(m2[1,1])), atol::Real=0)
 #  all(x->isapprox(x,0.0,rtol=rtol,atol=atol),abs(m1-m2))
 #end
@@ -39,8 +35,8 @@ let
   for i=1:100
     da = round(Int,round(rand()*10))+1
     db = round(Int,round(rand()*10))+1
-    ra = partialtrace(projector(normalize(randn(da*3)+1im*randn(da*3))),[da,3],2)
-    rb = partialtrace(projector(normalize(randn(db*3)+1im*randn(db*3))),[db,3],2)
+    ra = partialtrace(projector(randn(da*3)+1im*randn(da*3)),[da,3],2)
+    rb = partialtrace(projector(randn(db*3)+1im*randn(db*3)),[db,3],2)
     @test isapprox(partialtrace(kron(ra,rb),[da,db],1),rb,atol=1e-15)
     @test isapprox(partialtrace(kron(ra,rb),[da,db],2),ra,atol=1e-15)
   end
@@ -62,15 +58,12 @@ let
   @test isapprox(liou2kraus(eye(4)),Matrix{Complex128}[zeros(2,2), zeros(2,2), zeros(2,2), eye(2)],atol=1e-7)
   @test isapprox(kraus2choi(Matrix{Complex128}[eye(2)]),id_choi)
 
-  @test isapprox(depol(2),projector(normalize(vec(eye(2)))),atol=1e-15)
+  @test isapprox(depol(2),projector(vec(eye(2))),atol=1e-15)
   @test isapprox(depol(2),depol(2,1.))
   @test isapprox(depol(2,0.),eye(4),atol=1e-15)
 
   for i=1:100
-    rpsi = normalize(randn(3)+1im*randn(3))
-    @test isapprox(norm(rpsi),1.)
-    
-    rrho = partialtrace(projector(normalize(randn(3^3)+1im*randn(3^3))),[3,9],2)
+    rrho = partialtrace(projector(randn(3^3)+1im*randn(3^3)),[3,9],2)
     @test isapprox(trace(rrho),1.)
     @test ishermitian(rrho)
     @test ispossemidef(rrho)
