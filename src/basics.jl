@@ -1,5 +1,3 @@
-using Compat
-
 export ket,
        bra,
        ketbra,
