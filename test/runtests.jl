@@ -1,6 +1,8 @@
-using Base.Test, QuantumInfo
+using QuantumInfo
+using Test
 
-import Base.isapprox
+import LinearAlgebra
+import QuantumInfo.eye
 
 rtoldefault = Base.rtoldefault
 
@@ -8,12 +10,12 @@ rtoldefault = Base.rtoldefault
 #  all(x->isapprox(x,0.0,rtol=rtol,atol=atol),abs(m1-m2))
 #end
 
-function isapprox{T1,T2}(v1::Vector{Matrix{T1}},v2::Vector{Matrix{T2}}; rtol::Real=rtoldefault(abs(v1[1][1,1]),abs(v2[1][1,1])), atol::Real=0)
+function Base.isapprox(v1::Vector, v2::Vector; atol::Real=0, rtol::Real=rtoldefault(abs(v1[1][1,1]),abs(v2[1][1,1]), atol))
   local v
   if length(v1) != length(v2)
     false
   else
-    v = Matrix{T1}[ abs(v1[i]-v2[i]) for i in 1:length(v1) ]
+    v = Matrix{eltype(v1[1])}[ abs.(v1[i]-v2[i]) for i in 1:length(v1) ]
     all(x->isapprox(x,zeros(size(x,1),size(x,2)),rtol=rtol,atol=atol),v)
   end
 end
@@ -41,7 +43,7 @@ let
     @test isapprox(partialtrace(kron(ra,rb),[da,db],2),ra,atol=1e-15)
   end
 
-  id_choi = 1/2.*[1 0 0 1;0 0 0 0;0 0 0 0;1 0 0 1];
+  id_choi = 1/2 .* [1 0 0 1;0 0 0 0;0 0 0 0;1 0 0 1];
 
   @test liou(eye(2),eye(2)) == eye(4)
   @test liou(eye(2)) == liou(eye(2),eye(2))
@@ -53,10 +55,10 @@ let
 
   @test isapprox(choi2liou(id_choi),eye(4))
   @test isapprox(liou2choi(eye(4)),id_choi)
-  @test isapprox(choi2kraus(id_choi),Matrix{Complex128}[zeros(2,2), zeros(2,2), zeros(2,2), eye(2)],atol=1e-7)
-  @test isapprox(kraus2liou(Matrix{Complex128}[eye(2)]),eye(4))
-  @test isapprox(liou2kraus(eye(4)),Matrix{Complex128}[zeros(2,2), zeros(2,2), zeros(2,2), eye(2)],atol=1e-7)
-  @test isapprox(kraus2choi(Matrix{Complex128}[eye(2)]),id_choi)
+  @test isapprox(choi2kraus(id_choi),Matrix{ComplexF64}[zeros(2,2), zeros(2,2), zeros(2,2), eye(2)],atol=1e-7)
+  @test isapprox(kraus2liou(Matrix{ComplexF64}[eye(2)]),eye(4))
+  @test isapprox(liou2kraus(eye(4)),Matrix{ComplexF64}[zeros(2,2), zeros(2,2), zeros(2,2), eye(2)],atol=1e-7)
+  @test isapprox(kraus2choi(Matrix{ComplexF64}[eye(2)]),id_choi)
 
   @test isapprox(depol(2),projector(vec(eye(2))),atol=1e-15)
   @test isapprox(depol(2),depol(2,1.))
@@ -64,15 +66,15 @@ let
 
   for i=1:100
     rrho = partialtrace(projector(randn(3^3)+1im*randn(3^3)),[3,9],2)
-    @test isapprox(trace(rrho),1.)
-    @test ishermitian(rrho)
+    @test isapprox(LinearAlgebra.tr(rrho),1.)
+    @test QuantumInfo.ishermitian(rrho)
     @test ispossemidef(rrho)
-    
-    ru = svd(randn(3,3)+1im*randn(3,3))[1]
+
+    ru = LinearAlgebra.svd(randn(3,3)+1im*randn(3,3)).U
     @test isapprox(ru*ru',eye(3),atol=1e-13)
     @test isapprox(ru'*ru,eye(3),atol=1e-13)
-    
-    rv = svd(randn(3,3)+1im*randn(3,3))[1]
+
+    rv = LinearAlgebra.svd(randn(3,3)+1im*randn(3,3)).U
     re = (liou(ru)+liou(rv))/2
     @test ispossemidef(liou2choi(re),tol=1e-13)
     @test isapprox(partialtrace(liou2choi(re),[3,3],2),eye(3)/3,atol=1e-15)

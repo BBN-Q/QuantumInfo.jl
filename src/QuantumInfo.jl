@@ -1,8 +1,13 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module QuantumInfo
-  using Cliffords
+using Cliffords
+import LinearAlgebra
 
-  include("basics.jl")
-  include("open-systems.jl")
+# As a stopgap, reintroduce the old `eye`.
+eye(m::AbstractMatrix) = Matrix{eltype(m)}(LinearAlgebra.I, size(m))
+
+eye(n::Integer) = Matrix{Float64}(LinearAlgebra.I, (n, n))
+
+include("basics.jl")
+include("open-systems.jl")
 
 end
