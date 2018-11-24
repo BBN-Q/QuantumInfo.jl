@@ -1,5 +1,3 @@
-using Compat
-
 export ket,
        bra,
        ketbra,
@@ -14,7 +12,7 @@ export ket,
        ispossemidef,
        pauli_decomp
 
-trnorm(M::Matrix) = sum(svdvals(M))
+trnorm(M::Matrix) = sum(LinearAlgebra.svdvals(M))
 
 """
 `basis_vector(T,i,d)`
@@ -22,7 +20,7 @@ trnorm(M::Matrix) = sum(svdvals(M))
 Returns the `(i+1)`th basis element in a `d` dimensional Euclidean space
 as a vector of type `t`.
 """
-function basis_vector{T}( t::Type{T}, i::Int, d::Int )
+function basis_vector( t::Type{T}, i::Int, d::Int ) where T
   result = zeros(T, d)
   result[i+1] = 1
   result
@@ -98,7 +96,7 @@ Computes the rank-1 projector operator corresponding to a given vector. If more 
 vector is given, the projector into the space spanned by the vectors is computed.
 """
 function projector( v::Vector )
-    v*v'/norm(v,2)^2
+    v*v'/LinearAlgebra.norm(v,2)^2
 end
 
 """
@@ -122,7 +120,7 @@ end
 """
 Computes the partial trace of a matrix `m`.
 """
-function partialtrace{T}( m::Matrix{T}, ds::Vector, dt::Int )
+function partialtrace( m::Matrix{T}, ds::Vector, dt::Int ) where T
   s = size(m)
   l = length(ds);
   if s[1] != s[2]
@@ -145,7 +143,7 @@ function partialtrace{T}( m::Matrix{T}, ds::Vector, dt::Int )
   # now trace over the last subsystem
   new_m = zeros( T, prod(ds[indices])^2 )
   for ii in 1:prod(ds[indices])^2
-    new_m[ii] = trace(reshape(m[ii,:,:],(ds[dt],ds[dt])))
+    new_m[ii] = LinearAlgebra.tr(reshape(m[ii,:,:],(ds[dt],ds[dt])))
   end
   reshape(new_m, (prod(ds[indices]),prod(ds[indices])) )
 end
@@ -163,10 +161,10 @@ end
 """
 Computes a purification of `rho`
 """
-function purify{T}( rho::Matrix{T} )
+function purify( rho::Matrix )
   d = size(rho,1)
   (vals,vecs) = eig(rho)
-  psi = zeros(T,d^2)
+  psi = zeros(eltypeof(rho), d^2)
   for ii=1:d
     psi += sqrt(vals[ii]) * kron(vecs[:,ii],ket(ii-1,d))
   end
@@ -181,7 +179,7 @@ function concurrence(m)
     σy = [0 -1im; 1im 0];
     mt = kron(σy,σy)*ms*kron(σy,σy)
     R = sqrtm(sqrtm(m)*mt*sqrtm(m))
-    res = dot(sort(real(eigvals(R)),rev=true),[1,-1,-1,-1])
+    res = dot(sort(real(LinearAlgebra.eigvals(R)),rev=true),[1,-1,-1,-1])
 
     return res
 end
@@ -219,7 +217,7 @@ fidelity measure used is the one defined by Josza.
 """
 function avgfidelity(liou,liou_uni;kind=:josza)
     d = sqrt(size(liou,2))
-    f = (real(trace(liou*liou_uni'))+d)/(d^2+d)
+    f = (real(LinearAlgebra.tr(liou*liou_uni'))+d)/(d^2+d)
     return f
 end
 
@@ -237,7 +235,7 @@ end
 Tests if a matrix is positive semidefinite within a given tolerance.
 """
 function ispossemidef(m;tol=0.0)
-    evs = eigvals(m)
+    evs = LinearAlgebra.eigvals(m)
     tol = tol==0.0 ? 1e2*eps(abs.(one(eltype(m)))) : tol
     all(real(evs) .> -tol) && all(abs.(imag(evs)) .< tol)
 end
@@ -250,7 +248,7 @@ function pauli_decomp(ρ::Matrix, cutoff=1e-3)
     d2 = size(ρ, 1)
     d = round(Int, sqrt(d2))
     for p in allpaulis(d)
-        val = real(trace(ρ * p)) / d2
+        val = real(LinearAlgebra.tr(ρ * p)) / d2
         if val > cutoff
             r[p] = val
         end

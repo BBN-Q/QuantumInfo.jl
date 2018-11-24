@@ -1,18 +1,26 @@
 language: julia
+
+os:
+  - osx
+  - linux
+
 julia:
-  - 0.6
   - 0.7
+  - 1.0
   - nightly
-matrix:
-  allowed_failures:
-    - julia: 0.7
-    - julia: nightly
+
+# matrix:
+#   allowed_failures:
+#     - julia: 0.7
+#     - julia: nightly
+
 notifications:
   email: false
 # uncomment the following lines to override the default test script
-#script:
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia --check-bounds=yes -e 'Pkg.clone(pwd()); Pkg.build("QuantumInfo"); Pkg.test("QuantumInfo"; coverage=true)'
+script:
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia --check-bounds=yes --color=yes -e 'using Pkg; Pkg.clone(pwd()); Pkg.develop("Cliffords"); Pkg.build("QuantumInfo"); Pkg.test("QuantumInfo"; coverage=true)'
+
 
 # necessary to run on new container-based infrastructure
 sudo: false

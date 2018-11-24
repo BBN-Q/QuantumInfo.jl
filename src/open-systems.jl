@@ -25,8 +25,8 @@ export mat,
        nearestu
 
 mat( v::Vector, r=round(Int,sqrt(length(v))), c=round(Int,sqrt(length(v))) ) = reshape( v, r, c )
-liou{T<:AbstractMatrix}( left::T, right::T ) = kron( transpose(right), left )
-liou{T<:AbstractMatrix}( m::T ) = kron( conj(m), m )
+liou( left::AbstractMatrix, right::AbstractMatrix )  = kron( transpose(right), left )
+liou( m::AbstractMatrix ) = kron( conj(m), m )
 
 function choi_liou_involution( r::Matrix )
   d = round(Int, sqrt(size(r,1)) )
@@ -50,21 +50,23 @@ function liou2choi( r::Matrix )
   choi_liou_involution( r )/sqrt(size(r,1))
 end
 
-function choi2kraus{T}( r::Matrix{T}  )
-  (vals,vecs) = eig( sqrt(size(r,1))*r )
-  #vals = eigvals( sqrt(size(r,1))*r )
-  kraus_ops = Matrix{T}[]
-  for i in 1:length(vals)
-    push!(kraus_ops, sqrt(vals[i])*mat(vecs[:,i]))
-  end
-  kraus_ops
+function choi2kraus( r::Matrix  )
+    r = LinearAlgebra.eigen( sqrt(size(r,1))*r )
+    vals, vecs = (r.values, r.vectors)
+    #vals = eigvals( sqrt(size(r,1))*r )
+    kraus_ops = Matrix{eltype(r)}[]
+    for i in 1:length(vals)
+        push!(kraus_ops, sqrt(vals[i])*mat(vecs[:,i]))
+    end
+    kraus_ops
 end
 
-function choi2stinespring{T}( r::Matrix{T}  )
-  (vals,vecs) = eig( Hermitian(sqrt(size(r,1))*r) ) # we are assuming Hermiticity-preserving maps
-  #vals = eigvals( sqrt(size(r,1))*r )
-  A_ops = Matrix{T}[]
-  B_ops = Matrix{T}[]
+function choi2stinespring( r::Matrix  )
+  r = LinearAlgebra.eigen( Hermitian(sqrt(size(r,1))*r) ) # we are assuming Hermiticity-preserving maps
+  vals, vecs = (r.values, r.vectors)
+    #vals = eigvals( sqrt(size(r,1))*r )
+  A_ops = Matrix{eltype(r)}[]
+  B_ops = Matrix{eltype(r)}[]
   d = length(vals)
   for i in 1:length(vals)
     push!(A_ops, kron(sqrt(abs(vals[i]))*mat(vecs[:,i]),ket(i-1,d)))
@@ -73,12 +75,12 @@ function choi2stinespring{T}( r::Matrix{T}  )
   return sum(A_ops),sum(B_ops)
 end
 
-function liou2stinespring{T}( r::Matrix{T} )
+function liou2stinespring( r::Matrix )
   return r |> liou2choi |> choi2stinespring
 end
 
-function kraus2liou{T}( k::Vector{Matrix{T}} )
-  l = zeros(T,map(x->x^2,size(k[1])))
+function kraus2liou( k::Vector )
+  l = zeros(eltype(k[1]),map(x->x^2,size(k[1])))
   for i in 1:length(k)
     l = l + liou(k[i],k[i]')
   end
@@ -89,8 +91,8 @@ function liou2kraus( l::Matrix )
   choi2kraus( liou2choi( l ) )
 end
 
-function kraus2choi{T}( k::Vector{Matrix{T}} )
-  c = zeros(T,map(x->x^2,size(k[1])))
+function kraus2choi( k::Vector )
+  c = zeros(eltype(k[1]),map(x->x^2,size(k[1])))
   for i in 1:length(k)
     c = vec(k[i])*vec(k[i])'
   end
@@ -113,7 +115,7 @@ function pauliliou2liou( m::Matrix )
     error("Only matrices with dimension 4^n supported.")
   end
   dsq = size(m,1)
-  res = zeros(Complex128,size(m))
+  res = zeros(ComplexF64,size(m))
   n = round(Int,log(2,dsq)/2)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
@@ -123,18 +125,18 @@ function pauliliou2liou( m::Matrix )
   res
 end
 
-function liou2pauliliou{T}( m::Matrix{T} )
+function liou2pauliliou( m::Matrix )
   if size(m,1) != size(m,2)
     error("Only square matrices supported")
   elseif size(m,1) != 4^(floor(log2(size(m,1))/2))
     error("Only matrices with dimension 4^n supported.")
   end
   dsq = size(m,1)
-  res = zeros(Complex128,size(m))
+  res = zeros(ComplexF64,size(m))
   n = round(Int,log(2,dsq)/2)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
-      res[i,j] += trace( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
+      res[i,j] += LinearAlgebra.tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
     end
   end
   res
@@ -157,7 +159,7 @@ Given a superoperator `j` in a Liouville representation, `unitalproj`
 extracts the closest superoperator (in Frobenius norm) that is
 unital. The result may not be completely positive.
 """
-function unitalproj{T}( m::Matrix{T} )
+function unitalproj( m::Matrix )
   d2 = size(m,1)
   d  = round(Int,sqrt(d2))
   id = projector(normalize(vec(eye(d))))
@@ -172,7 +174,7 @@ Checks if a matrix is Hermitian.
 function ishermitian(m; tol=0.0)
     ah = (m-m')/2
     tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
-    norm(ah,Inf)<tol
+    LinearAlgebra.norm(ah,Inf)<tol
 end
 
 """
@@ -193,7 +195,7 @@ function istp(m; tol=0.0)
     tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
-    norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
+    LinearAlgebra.norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
 end
 
 """
@@ -214,7 +216,7 @@ function isunital(m; tol=0.0)
     tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
-    norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
+    LinearAlgebra.norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
 end
 
 """
@@ -223,7 +225,7 @@ isliouvillian(m; tol)
 Checks the conditions for a physical Liouvillian matrix (CPTP map generator)
 """
 function isliouvillian(m;tol=0.0)
-    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol 
+    tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
 
     mΓ = choi_liou_involution(m)
     d = round(Int,sqrt(size(m,1)))
@@ -231,7 +233,7 @@ function isliouvillian(m;tol=0.0)
     Πω = projector(ω)
     Πω⊥ = eye(d^2)-Πω
 
-    return ishermitian(mΓ,tol=tol) && norm(ω'*m,Inf)<tol && ispossemidef(Πω⊥*mΓ*Πω⊥,tol=tol)
+    return ishermitian(mΓ,tol=tol) && LinearAlgebra.norm(ω'*m,Inf)<tol && ispossemidef(Πω⊥*mΓ*Πω⊥,tol=tol)
 end
 
 """
@@ -259,7 +261,8 @@ See D. Oi, [Phys. Rev. Lett. 91, 067902 (2003)](http://journals.aps.org/prl/abst
 """
 function nearestu(l)
     c = liou2choi(l)
-    vals,vecs = eig(Hermitian(c))
+    r = LinearAlgebra.eigen(Hermitian(c))
+    vals, vecs = (r.values, r.vectors)
     imax = indmax(vals)
     Λ = mat(vecs[:,imax])
     U,Σ,V = svd(Λ)
