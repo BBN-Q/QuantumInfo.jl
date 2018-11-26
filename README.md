@@ -7,8 +7,12 @@ calculation in quantum information processing.
 
 Install it with the following command:
 
-	  Pkg.add("QuantumInfo")
+	  julia> Pkg.add("QuantumInfo")
+	  
+For Julia v1.0 use the master branch:
 
+	  (v1.0) pkg> add QuantumInfo#master
+	  
 # Acknowledgements
 
 This research was funded by the Intelligence Advanced Research
