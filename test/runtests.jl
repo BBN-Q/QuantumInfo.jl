@@ -17,6 +17,14 @@ end
 
 @testset "representation conversion" begin
     id_choi = 1/2 .* [1 0 0 1;0 0 0 0;0 0 0 0;1 0 0 1];
+    deph_choi = 1/2 .* [1 0 0 0.99;0 0 0 0;0 0 0 0;0.99 0 0 1];
+    deph_liou = [1 0 0 0;0 0.99 0 0;0 0 0.99 0;0 0 0 1];
+
+    # Kraus operators for a dephasing channel
+    ρ = 0.01;
+    M_0 = sqrt(1-ρ)*eye(2);
+    M_1 = sqrt(ρ)*Matrix{ComplexF64}([1.0 0.0; 0.0 0.0]);
+    M_2 = sqrt(ρ)*Matrix{ComplexF64}([0.0 0.0;0.0 1.0]);
 
     @test liou(eye(2),eye(2)) == eye(4)
     @test liou(eye(2)) == liou(eye(2),eye(2))
@@ -32,6 +40,9 @@ end
     @test isapprox(kraus2liou(Matrix{ComplexF64}[eye(2)]),eye(4))
     @test isapprox(liou2kraus(eye(4)),Matrix{ComplexF64}[zeros(2,2), zeros(2,2), zeros(2,2), eye(2)],atol=1e-7)
     @test isapprox(kraus2choi(Matrix{ComplexF64}[eye(2)]),id_choi)
+
+    @test isapprox(kraus2choi([M_0, M_1, M_2]),deph_choi)
+    @test isapprox(kraus2liou([M_0, M_1, M_2]),deph_liou)
 
     @test isapprox(liou2pauliliou(eye(4)), eye(4))
     @test isapprox(pauliliou2liou(eye(4)), eye(4))
