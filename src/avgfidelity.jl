@@ -19,13 +19,13 @@ convert(t::Type{Float64},f::AvgFidelity) = f.val
 """
 DepolRate(p;dim=2)
 
-Depolarizing rate of unitarily invariant twirl of some random channel.  
-If the unitarily invariant twirl of some channel is `D`, the depolarizing rate `p` is 
+Depolarizing rate of unitarily invariant twirl of some random channel.
+If the unitarily invariant twirl of some channel is `D`, the depolarizing rate `p` is
 defined by
 
 `D(ρ) = p ⋅ ρ + (1-p) ⋅ I/d`
 
-where `I` is the identity matrix. Note that this implies `p` may be negative (i.e., it 
+where `I` is the identity matrix. Note that this implies `p` may be negative (i.e., it
 is not a probability).
 """
 immutable DepolRate <: AvgFidelityMetric

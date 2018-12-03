@@ -51,7 +51,7 @@ function liou2choi( r::Matrix )
 end
 
 function choi2kraus( r::Matrix  )
-    r = LinearAlgebra.eigen( sqrt(size(r,1))*r )
+    r = eigen( sqrt(size(r,1))*r )
     vals, vecs = (r.values, r.vectors)
     #vals = eigvals( sqrt(size(r,1))*r )
     kraus_ops = Matrix{eltype(r)}[]
@@ -62,7 +62,7 @@ function choi2kraus( r::Matrix  )
 end
 
 function choi2stinespring( r::Matrix  )
-  r = LinearAlgebra.eigen( Hermitian(sqrt(size(r,1))*r) ) # we are assuming Hermiticity-preserving maps
+  r = eigen( Hermitian(sqrt(size(r,1))*r) ) # we are assuming Hermiticity-preserving maps
   vals, vecs = (r.values, r.vectors)
     #vals = eigvals( sqrt(size(r,1))*r )
   A_ops = Matrix{eltype(r)}[]
@@ -136,7 +136,7 @@ function liou2pauliliou( m::Matrix )
   n = round(Int,log(2,dsq)/2)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
-      res[i,j] += LinearAlgebra.tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
+      res[i,j] += tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
     end
   end
   res
@@ -174,7 +174,7 @@ Checks if a matrix is Hermitian.
 function ishermitian(m; tol=0.0)
     ah = (m-m')/2
     tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
-    LinearAlgebra.norm(ah,Inf)<tol
+    norm(ah,Inf)<tol
 end
 
 """
@@ -195,7 +195,7 @@ function istp(m; tol=0.0)
     tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
-    LinearAlgebra.norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
+    norm(m'*vec(eye(d))-vec(eye(d)),Inf) < tol
 end
 
 """
@@ -216,7 +216,7 @@ function isunital(m; tol=0.0)
     tol = tol==0.0 ? 1e2*eps(abs(one(eltype(m)))) : tol
     dsq = size(m,1)
     d = round(Int,sqrt(dsq))
-    LinearAlgebra.norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
+    norm(m*vec(eye(d))-vec(eye(d)),Inf) < tol
 end
 
 """
@@ -233,7 +233,7 @@ function isliouvillian(m;tol=0.0)
     Πω = projector(ω)
     Πω⊥ = eye(d^2)-Πω
 
-    return ishermitian(mΓ,tol=tol) && LinearAlgebra.norm(ω'*m,Inf)<tol && ispossemidef(Πω⊥*mΓ*Πω⊥,tol=tol)
+    return ishermitian(mΓ,tol=tol) && norm(ω'*m,Inf)<tol && ispossemidef(Πω⊥*mΓ*Πω⊥,tol=tol)
 end
 
 """
@@ -261,7 +261,7 @@ See D. Oi, [Phys. Rev. Lett. 91, 067902 (2003)](http://journals.aps.org/prl/abst
 """
 function nearestu(l)
     c = liou2choi(l)
-    r = LinearAlgebra.eigen(Hermitian(c))
+    r = eigen(Hermitian(c))
     vals, vecs = (r.values, r.vectors)
     imax = indmax(vals)
     Λ = mat(vecs[:,imax])

@@ -1,11 +1,11 @@
 module QuantumInfo
 using Cliffords
-import LinearAlgebra
+using LinearAlgebra: I, norm, tr, eigvals, eigen, svdvals
 
 # As a stopgap, reintroduce the old `eye`.
-eye(m::AbstractMatrix) = Matrix{eltype(m)}(LinearAlgebra.I, size(m))
+eye(m::AbstractMatrix) = Matrix{eltype(m)}(I, size(m))
 
-eye(n::Integer) = Matrix{Float64}(LinearAlgebra.I, (n, n))
+eye(n::Integer) = Matrix{Float64}(I, (n, n))
 
 include("basics.jl")
 include("open-systems.jl")
