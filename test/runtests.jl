@@ -4,32 +4,6 @@ using Test
 import LinearAlgebra
 import QuantumInfo.eye
 
-#function isapprox(m1::Matrix,m2::Matrix; rtol::Real=rtoldefault(abs(m1[1,1]),abs(m2[1,1])), atol::Real=0)
-#  all(x->isapprox(x,0.0,rtol=rtol,atol=atol),abs(m1-m2))
-#end
-
-function Base.isapprox(v1::Vector, v2::Vector; atol::Real=0, rtol::Real=Base.rtoldefault(abs(v1[1][1,1]),abs(v2[1][1,1]), atol))
-  local v
-  if length(v1) != length(v2)
-    false
-  else
-    v = Matrix{eltype(v1[1])}[ abs.(v1[i]-v2[i]) for i in 1:length(v1) ]
-    all(x->isapprox(x,zeros(size(x,1),size(x,2)),rtol=rtol,atol=atol),v)
-  end
-end
-
-#function ishermitian(m::Matrix; rtol::Real=rtoldefault(abs((m[1,1]+conj(m[1,1]))/2),abs(m[1,1])), atol::Real=0)
-#  isapprox((m+m')/2,m,rtol=rtol,atol=atol)
-#end
-
-#function ispositive(m::Matrix;rtol::Real=-1,atol::Real=0)
-#  if rtol<0
-#      ishermitian(m) && all(x->isapprox(x,0,atol=atol),filter(x->x<0,eigvals(Hermitian(m))))
-#  else
-#      ishermitian(m) && all(x->isapprox(x,0,atol=atol,rtol=rtol),filter(x->x<0,eigvals(Hermitian(m))))
-#  end
-#end
-
 @testset "partial trace" begin
     for i=1:100
         da = round(Int,round(rand()*10))+1
