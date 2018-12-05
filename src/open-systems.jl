@@ -94,7 +94,7 @@ end
 function kraus2choi( k::Vector )
   c = zeros(eltype(k[1]),map(x->x^2,size(k[1])))
   for i in 1:length(k)
-    c = vec(k[i])*vec(k[i])'
+    c = c + vec(k[i])*vec(k[i])'
   end
   c/sqrt(size(c,1))
 end
