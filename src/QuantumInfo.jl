@@ -1,6 +1,6 @@
 module QuantumInfo
 using Cliffords
-using LinearAlgebra: I, norm, tr, eigvals, eigen, svdvals
+using LinearAlgebra: I, norm, tr, eigvals, eigen, svdvals, lmul!
 
 # As a stopgap, reintroduce the old `eye`.
 eye(m::AbstractMatrix) = Matrix{eltype(m)}(I, size(m))

@@ -112,9 +112,20 @@ trnormalize( m::AbstractMatrix ) = m/trnorm(m)
 Normalizes a matrix with respect to the trace norm (Schatten 1
 norm) in place.
 """
-function trnormalize!( m::AbstractMatrix )
+function trnormalize!( m::AbstractMatrix{T} ) where T <: ComplexF64
+    n = convert(ComplexF64, trnorm(m))
+    lmul!(1/n,m)
+end
+
+function trnormalize!( m::AbstractMatrix{T} ) where T <: Float64
     n = trnorm(m)
-    scale!(m,1/n)
+    lmul!(1/n,m)
+end
+
+function trnormalize!( m::AbstractMatrix{T} ) where T <: Int64
+    n = convert(Float64, trnorm(m))
+    m = convert(Array{Float64}, m)
+    lmul!(1/n,m)
 end
 
 """
