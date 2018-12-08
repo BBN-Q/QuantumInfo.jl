@@ -12,7 +12,7 @@ export ket,
        ispossemidef,
        pauli_decomp
 
-trnorm(M::Matrix) = sum(svdvals(M))
+trnorm(M::AbstractMatrix) = sum(svdvals(M))
 
 """
 `basis_vector(T,i,d)`
@@ -95,7 +95,7 @@ ketbra( i::Int, j::Int, d::Int ) = ket( i, d ) * bra( j, d )
 Computes the rank-1 projector operator corresponding to a given vector. If more than one
 vector is given, the projector into the space spanned by the vectors is computed.
 """
-function projector( v::Vector )
+function projector( v::AbstractVector )
     v*v'/norm(v,2)^2
 end
 
@@ -131,7 +131,7 @@ end
 """
 Computes the partial trace of a matrix `m`.
 """
-function partialtrace( m::Matrix{T}, ds::Vector, dt::Int ) where T
+function partialtrace( m::AbstractMatrix{T}, ds::AbstractVector, dt::Int ) where T
   s = size(m)
   l = length(ds);
   if s[1] != s[2]
@@ -172,7 +172,7 @@ end
 """
 Computes a purification of `rho`
 """
-function purify( rho::Matrix )
+function purify( rho::AbstractMatrix )
   d = size(rho,1)
   (vals,vecs) = eig(rho)
   psi = zeros(eltypeof(rho), d^2)
@@ -200,7 +200,7 @@ Computes the fidelity between two quantum states. By default, the Josza conventi
 is used. The Uhlmann fidelity may be calculated by using the `kind` keyword argument
 with the value `:uhlmann`.
 """
-function fidelity(a::Matrix,b::Matrix;kind=:josza)
+function fidelity(a::AbstractMatrix,b::AbstractMatrix;kind=:josza)
     fu = trnorm(sqrtm(a)*sqrtm(b))
     if kind==:josza
         return fu^2
@@ -209,15 +209,15 @@ function fidelity(a::Matrix,b::Matrix;kind=:josza)
     end
 end
 
-function fidelity(a::Vector,b::Vector;kind=:josza)
+function fidelity(a::AbstractVector,b::AbstractVector;kind=:josza)
     return fidelity(projector(a),projector(b),kind=kind)
 end
 
-function fidelity(a::Vector,b::Matrix;kind=:josza)
+function fidelity(a::AbstractVector,b::AbstractMatrix;kind=:josza)
     return fidelity(projector(a),b,kind=kind)
 end
 
-function fidelity(a::Matrix,b::Vector;kind=:josza)
+function fidelity(a::AbstractMatrix,b::AbstractVector;kind=:josza)
     return fidelity(b,a,kind=kind)
 end
 
@@ -236,11 +236,11 @@ end
 #       avg2entfidelity()
 #       ent2avgfidelity()
 
-# fidelity Vector Vector
-# fidelity Vector Matrix
-# fidelity Matrix Matrix
-# superfidelity Matrix Matrix
-# subfidelity Matrix Matrix
+# fidelity AbstractVector AbstractVector
+# fidelity AbstractVector AbstractMatrix
+# fidelity AbstractMatrix AbstractMatrix
+# superfidelity AbstractMatrix AbstractMatrix
+# subfidelity AbstractMatrix AbstractMatrix
 
 """
 Tests if a matrix is positive semidefinite within a given tolerance.
@@ -254,7 +254,7 @@ end
 """
 Decompose a density matrix into Pauli operators with a given cutoff.
 """
-function pauli_decomp(ρ::Matrix, cutoff=1e-3)
+function pauli_decomp(ρ::AbstractMatrix, cutoff=1e-3)
     r = Dict{Pauli,Float64}()
     d2 = size(ρ, 1)
     d = round(Int, sqrt(d2))
