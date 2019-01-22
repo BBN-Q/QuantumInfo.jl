@@ -24,33 +24,33 @@ export mat,
        isliouvillian,
        nearestu
 
-mat( v::Vector, r=round(Int,sqrt(length(v))), c=round(Int,sqrt(length(v))) ) = reshape( v, r, c )
+mat(v::AbstractVector, r=round(Int,sqrt(length(v))), c=round(Int,sqrt(length(v))) ) = reshape( v, r, c )
 liou( left::AbstractMatrix, right::AbstractMatrix )  = kron( transpose(right), left )
 liou( m::AbstractMatrix ) = kron( conj(m), m )
 
-function choi_liou_involution( r::Matrix )
+function choi_liou_involution( r::AbstractMatrix )
   d = round(Int, sqrt(size(r,1)) )
   rl = reshape( r, (d, d, d, d) )
   rl = permutedims( rl, [1,3,2,4] )
   reshape( rl, size(r) )
 end
 
-function swap_involution( r::Matrix )
+function swap_involution( r::AbstractMatrix )
   d = round(Int, sqrt(size(r,1)) )
   rl = reshape( r, (d, d, d, d) )
   rl = permutedims( rl, [3,4,1,2] )
   reshape( rl, size(r) )
 end
 
-function choi2liou( r::Matrix  )
+function choi2liou( r::AbstractMatrix  )
   sqrt(size(r,1))*choi_liou_involution( r )
 end
 
-function liou2choi( r::Matrix )
+function liou2choi( r::AbstractMatrix )
   choi_liou_involution( r )/sqrt(size(r,1))
 end
 
-function choi2kraus( r::Matrix  )
+function choi2kraus( r::AbstractMatrix  )
     r = eigen( sqrt(size(r,1))*r )
     vals, vecs = (r.values, r.vectors)
     #vals = eigvals( sqrt(size(r,1))*r )
@@ -61,7 +61,7 @@ function choi2kraus( r::Matrix  )
     kraus_ops
 end
 
-function choi2stinespring( r::Matrix  )
+function choi2stinespring( r::AbstractMatrix  )
   r = eigen( Hermitian(sqrt(size(r,1))*r) ) # we are assuming Hermiticity-preserving maps
   vals, vecs = (r.values, r.vectors)
     #vals = eigvals( sqrt(size(r,1))*r )
@@ -75,11 +75,11 @@ function choi2stinespring( r::Matrix  )
   return sum(A_ops),sum(B_ops)
 end
 
-function liou2stinespring( r::Matrix )
+function liou2stinespring( r::AbstractMatrix )
   return r |> liou2choi |> choi2stinespring
 end
 
-function kraus2liou( k::Vector )
+function kraus2liou( k::AbstractVector )
   l = zeros(eltype(k[1]),map(x->x^2,size(k[1])))
   for i in 1:length(k)
     l = l + liou(k[i],k[i]')
@@ -87,11 +87,11 @@ function kraus2liou( k::Vector )
   l
 end
 
-function liou2kraus( l::Matrix )
+function liou2kraus( l::AbstractMatrix )
   choi2kraus( liou2choi( l ) )
 end
 
-function kraus2choi( k::Vector )
+function kraus2choi( k::AbstractVector )
   c = zeros(eltype(k[1]),map(x->x^2,size(k[1])))
   for i in 1:length(k)
     c = c + vec(k[i])*vec(k[i])'
@@ -100,15 +100,15 @@ function kraus2choi( k::Vector )
 end
 
 # TODO: Add support for sparse matrices
-function dissipator( a::Matrix )
+function dissipator( a::AbstractMatrix )
   liou(a,a') - 1/2 * liou(a'*a, eye(a)) - 1/2 * liou(eye(a),a'*a)
 end
 
-function hamiltonian( h::Matrix )
+function hamiltonian( h::AbstractMatrix )
   -1im * ( liou(h,eye(h)) - liou(eye(h),h) )
 end
 
-function pauliliou2liou( m::Matrix )
+function pauliliou2liou( m::AbstractMatrix )
   if size(m,1) != size(m,2)
     error("Only square matrices supported")
   elseif size(m,1) != 4^(floor(log2(size(m,1))/2))
@@ -125,7 +125,7 @@ function pauliliou2liou( m::Matrix )
   res
 end
 
-function liou2pauliliou( m::Matrix )
+function liou2pauliliou( m::AbstractMatrix )
   if size(m,1) != size(m,2)
     error("Only square matrices supported")
   elseif size(m,1) != 4^(floor(log2(size(m,1))/2))
@@ -159,7 +159,7 @@ Given a superoperator `j` in a Liouville representation, `unitalproj`
 extracts the closest superoperator (in Frobenius norm) that is
 unital. The result may not be completely positive.
 """
-function unitalproj( m::Matrix )
+function unitalproj( m::AbstractMatrix )
   d2 = size(m,1)
   d  = round(Int,sqrt(d2))
   id = projector(normalize(vec(eye(d))))
