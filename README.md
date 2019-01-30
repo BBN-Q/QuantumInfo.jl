@@ -5,13 +5,13 @@
 This Julia package contains functions that are convenient for common
 calculation in quantum information processing. 
 
-Install it with the following command:
+Install it in Julia v0.6 with the following command:
 
 	  julia> Pkg.add("QuantumInfo")
 	  
-For Julia v1.0 use the master branch:
+For Julia v1.0:
 
-	  (v1.0) pkg> add QuantumInfo#master
+	  (v1.0) pkg> add QuantumInfo
 	  
 # Acknowledgements
 
