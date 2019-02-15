@@ -1,12 +1,14 @@
-abstract AvgFidelityMetric
+abstract type AvgFidelityMetric 
 
-convert{T<:Real}(t::Type{T},x::AvgFidelityMetric) = x.val
-promote_rule{T<:AvgFidelityMetric,R<:Real}(t::Type{T},r::Type{R}) = promote_rule(Float64,R)
+end
+
+convert(t::Type{T},x::AvgFidelityMetric) where {T<:Real} = x.val
+promote_rule(t::Type{T},r::Type{R}) where {T<:AvgFidelityMetric,R<:Real} = promote_rule(Float64,R)
 
 """
 AvgFidelity(f;dim=2)
 """
-immutable AvgFidelity <: AvgFidelityMetric
+struct AvgFidelity <: AvgFidelityMetric
   dim::Int64
   val::Float64
   AvgFidelity(f;dim=2) = new(dim,f)
@@ -28,7 +30,7 @@ defined by
 where `I` is the identity matrix. Note that this implies `p` may be negative (i.e., it
 is not a probability).
 """
-immutable DepolRate <: AvgFidelityMetric
+struct DepolRate <: AvgFidelityMetric
   dim::Int64
   val::Float64
   DepolRate(p;dim=2) = new(dim,p)
@@ -37,7 +39,7 @@ end
 avgfidelity(x::DepolRate) = ((x.dim-1)*x.val+1)/x.dim
 convert(t::Type{DepolRate},f::AvgFidelity) = DepolRate((f.dim*f.val-1)/(f.dim-1),dim=f.dim)
 
-immutable RBDecayRate <: AvgFidelityMetric
+struct RBDecayRate <: AvgFidelityMetric
   dim::Int64
   val::Float64
   RBDecayRate(p;dim=2) = new(dim,p)
@@ -46,7 +48,7 @@ end
 avgfidelity(x::RBDecayRate) = 1-x.val
 convert(t::Type{RBDecayRate},f::AvgFidelity) = RBDecayRate(1-f.val,dim=f.dim)
 
-immutable EntanglementFidelity <: AvgFidelityMetric
+struct EntanglementFidelity <: AvgFidelityMetric
   dim::Int64
   val::Float64
   EntanglementFidelity(e; dim=2) = new(dim,e)
@@ -55,7 +57,7 @@ end
 avgfidelity(x::EntanglementFidelity) = (x.dim * x.val + 1)/(x.dim + 1)
 convert(t::Type{EntanglementFidelity},f::AvgFidelity) = EntanglementFidelity((f.val*(f.dim+1)-1)/f.dim,dim=f.dim)
 
-immutable χ00 <: AvgFidelityMetric
+struct χ00 <: AvgFidelityMetric
   dim::Int64
   val::Float64
   χ00(e; dim=2) = new(dim,e)

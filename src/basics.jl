@@ -189,7 +189,7 @@ function concurrence(m)
     ms = conj(m)
     σy = [0 -1im; 1im 0];
     mt = kron(σy,σy)*ms*kron(σy,σy)
-    R = sqrtm(sqrtm(m)*mt*sqrtm(m))
+    R = sqrt(sqrt(m)*mt*sqrt(m))
     res = dot(sort(real(eigvals(R)),rev=true),[1,-1,-1,-1])
 
     return res
@@ -201,7 +201,7 @@ is used. The Uhlmann fidelity may be calculated by using the `kind` keyword argu
 with the value `:uhlmann`.
 """
 function fidelity(a::AbstractMatrix,b::AbstractMatrix;kind=:josza)
-    fu = trnorm(sqrtm(a)*sqrtm(b))
+    fu = trnorm(sqrt(a)*sqrt(b))
     if kind==:josza
         return fu^2
     elseif kind==:uhlmann

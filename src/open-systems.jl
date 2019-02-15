@@ -263,7 +263,7 @@ function nearestu(l)
     c = liou2choi(l)
     r = eigen(Hermitian(c))
     vals, vecs = (r.values, r.vectors)
-    imax = indmax(vals)
+    imax = argmax(vals)
     Λ = mat(vecs[:,imax])
     U,Σ,V = svd(Λ)
     W = U*V'
