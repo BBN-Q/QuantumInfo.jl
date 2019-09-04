@@ -136,7 +136,7 @@ function liou2pauliliou( m::AbstractMatrix )
   res = similar(m, ComplexF64)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
-      res[j,i] = tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
+      res[j,i] = vec(complex(pj))' * m * vec(complex(pi)) *  / sqrt(dsq) )
     end
   end
   res
