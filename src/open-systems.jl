@@ -132,11 +132,11 @@ function liou2pauliliou( m::AbstractMatrix )
     error("Only matrices with dimension 4^n supported.")
   end
   dsq = size(m,1)
-  res = zeros(ComplexF64,size(m))
-  n = round(Int,log(2,dsq)/2)
+  n = round(Int, log(2,dsq)/2)
+  res = similar(m, ComplexF64)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
-      res[j,i] += tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
+      res[j,i] = tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
     end
   end
   res
