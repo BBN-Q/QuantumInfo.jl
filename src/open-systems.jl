@@ -136,7 +136,7 @@ function liou2pauliliou( m::AbstractMatrix )
   n = round(Int,log(2,dsq)/2)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
-      res[i,j] += tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
+      res[j,i] += tr( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
     end
   end
   res
