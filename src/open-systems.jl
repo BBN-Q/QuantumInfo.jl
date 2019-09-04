@@ -126,11 +126,9 @@ function pauliliou2liou( m::AbstractMatrix )
 end
 
 function liou2pauliliou( m::AbstractMatrix )
-  if size(m,1) != size(m,2)
-    error("Only square matrices supported")
-  elseif size(m,1) != 4^(floor(log2(size(m,1))/2))
-    error("Only matrices with dimension 4^n supported.")
-  end
+  @assert size(m,1) == size(m,2) "Only square matrices supported"
+  @assert size(m,1) == 4^(floor(log2(size(m,1))/2)) "Only matrices with dimension 4^n supported."
+
   dsq = size(m,1)
   n = round(Int, log(2,dsq)/2)
   res = similar(m, ComplexF64)
