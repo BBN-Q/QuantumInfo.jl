@@ -58,6 +58,18 @@ for eyesym in (:eye, :alteye)
     end
 end
 
+@testset "Pauli-Liouville" begin
+    # we expect an X90 to transform +X => +X, +Z => -Y, +Y => +Z
+    X90 = exp(-1im*π/4*[0 1;1 0])
+    @test liou2pauliliou(liou(X90)) ≈ [1 0 0 0;
+                                       0 1 0 0;
+                                       0 0 0 -1;
+                                       0 0 1 0]
+
+    # liou2pauliliou and pauliliou2liou should be inverses
+    @test pauliliou2liou(liou2pauliliou(liou(X90))) ≈ liou(X90)
+end
+
 @time @testset "depolarization" begin
     @test isapprox(depol(2),projector(vec(eye(2))),atol=1e-15)
     @test isapprox(depol(2),depol(2,1.))
