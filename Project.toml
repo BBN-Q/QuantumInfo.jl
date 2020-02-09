@@ -1,8 +1,14 @@
 name = "QuantumInfo"
 uuid = "0604f4cf-c3cf-450b-9cca-68ea63c82c80"
-authors = ["Marcus P da Silva <marcus@rigetti.com>"]
+authors = ["Marcus P da Silva"]
 version = "0.1.0"
 
 [deps]
 Cliffords = "276b0191-6968-5de0-98fd-2a81b0f3910d"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
