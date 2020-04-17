@@ -246,6 +246,9 @@ end
 Tests if a matrix is positive semidefinite within a given tolerance.
 """
 function ispossemidef(m;tol=0.0)
+    if !ishermitian(m)
+        @warn("Matix is not Hermitian!")
+    end
     evs = eigvals(m)
     tol = tol==0.0 ? 1e2*eps(abs.(one(eltype(m)))) : tol
     all(real(evs) .> -tol) && all(abs.(imag(evs)) .< tol)
