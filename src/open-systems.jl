@@ -134,7 +134,7 @@ function liou2pauliliou{T}( m::Matrix{T} )
   n = round(Int,log(2,dsq)/2)
   for (i,pi) in enumerate(allpaulis(n))
     for (j,pj) in enumerate(allpaulis(n))
-      res[i,j] += trace( m * vec(complex(pi)) * vec(complex(pj))' / sqrt(dsq) )
+      res[j,i] = vec(complex(pj))' * m * vec(complex(pi)) / sqrt(dsq)
     end
   end
   res

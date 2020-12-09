@@ -81,4 +81,16 @@ let
   @test isapprox(liou2pauliliou(eye(4)), eye(4))
   @test isapprox(pauliliou2liou(eye(4)), eye(4))
 
+  @testset "Pauli-Liouville" begin
+    # we expect an X90 to transform +X => +X, +Z => -Y, +Y => +Z
+    X90 = exp(-1im*π/4*[0 1;1 0])
+    @test liou2pauliliou(liou(X90)) ≈ [1 0 0 0;
+                                       0 1 0 0;
+                                       0 0 0 -1;
+                                       0 0 1 0]
+
+    # liou2pauliliou and pauliliou2liou should be inverses
+    @test pauliliou2liou(liou2pauliliou(liou(X90))) ≈ liou(X90)
+  end
+
 end
