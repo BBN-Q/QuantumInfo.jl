@@ -1,6 +1,5 @@
 # QuantumInfo.jl
-
-[![Build Status](https://travis-ci.org/BBN-Q/QuantumInfo.jl.svg?branch=master)](https://travis-ci.org/BBN-Q/QuantumInfo.jl)
+![build](https://github.com/BBN-Q/QuantumInfo.jl/workflows/.github/workflows/CI.yml/badge.svg)
 
 This Julia package contains functions that are convenient for common
 calculation in quantum information processing. 
