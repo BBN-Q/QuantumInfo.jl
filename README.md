@@ -1,6 +1,8 @@
 # QuantumInfo.jl
 ![Build Status](https://github.com/BBN-Q/QuantumInfo.jl/workflows/CI/badge.svg)
 
+[![codecov](https://codecov.io/gh/BBN-Q/QuantumInfo.jl/branch/master/graph/badge.svg?token=C4SSsQpWim)](https://codecov.io/gh/BBN-Q/QuantumInfo.jl)
+
 This Julia package contains functions that are convenient for common
 calculation in quantum information processing. 
 
