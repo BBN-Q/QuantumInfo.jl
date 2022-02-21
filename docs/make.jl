@@ -9,3 +9,7 @@ makedocs(
 	]
 )
 
+deploydocs(;
+	repo        = "github.com/BBN-Q/QuantumInfo.jl.git",
+	push_review = true
+)
